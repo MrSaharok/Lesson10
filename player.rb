@@ -15,7 +15,7 @@ class Player
     @money -= 10
   end
 
-  def card_count
+  def card_limit?
     cards.size < 3
   end
 
@@ -32,7 +32,7 @@ class Player
     points
   end
 
-  def show_cards
+  def show_card
     cards.flatten.map { |card| "#{card.rank}#{card.suit}" }
   end
 
