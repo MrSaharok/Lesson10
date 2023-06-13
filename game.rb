@@ -14,16 +14,22 @@ class Game
 
   def start
     round
+    if dealer.money <= 0 || user.money <= 0
+      exit
+    end
     loop do
       line
-      show_card(false)
+      show_cards(false)
       line
       user_select
-      auto_finish
+      auto_showdown
     end
   end
 
+  private
+
   def round
+    [user, dealer].each(&:clear)
     @deck = Deck.new
     @deck.shuffling
     [user, dealer].each do |player|
@@ -33,19 +39,21 @@ class Game
     end
   end
 
-  def distribution_money
-    case result
-    when 1
+  def result
+    if user.points == dealer.points && user.points <= 21
       dealer.money += @bank / 2
       user.money += @bank / 2
-    when 2
+      puts 'Draw!'
+    elsif (user.points > dealer.points) && user.points <= 21 || (user.points < dealer.points) && dealer.points > 21
       user.money += @bank
-    when 3
+      puts "#{user.name}:#{user.money}$ - WIN!!!"
+      puts "#{dealer.name}:#{dealer.money}$ - LOSS!!!"
+    else
       dealer.money += @bank
+      puts "#{dealer.name}:#{dealer.money}$ - WIN!!!"
+      puts "#{user.name}:#{user.money}$ - LOSS!!!"
     end
     @bank = 0
-    puts "#{dealer.name}:#{dealer.money}"
-    puts "#{user.name}:#{user.money}"
   end
 
   def user_select
@@ -57,7 +65,7 @@ class Game
     when 2
       take_card(user)
     when 3
-      open_cards
+      showdown
     else
       puts 'Error input!'
       nil
@@ -73,50 +81,32 @@ class Game
     player.cards << deck.pull
   end
 
-  def open_cards
-    show_card
+  def showdown
+    show_cards
     line
-    distribution_money
+    result
     line
-    new_round
-    continue?
+    play_again
   end
 
-  def auto_finish
-    if (user.card_count && dealer.card_count) || (user.card_count && !dealer.card_count)
+  def auto_showdown
+    if (user.card_limit? && dealer.card_limit?) || (user.card_limit? && !dealer.card_limit??)
       true
     else
-      open_cards
+      showdown
     end
   end
 
-  def new_round
-    [user, dealer].each(&:clear)
-  end
-
-  def result
-    if user.points == dealer.points && user.points <= 21
-      puts 'Draw!'
-      1
-    elsif (user.points > dealer.points) && user.points <= 21 || (user.points < dealer.points) && dealer.points > 21
-      puts "#{user.name} WIN!!!"
-      2
-    else
-      puts "#{dealer.name} WIN!!!"
-      3
-    end
-  end
-
-  def continue?
-    puts 'Play it again? 1.Yes 2. No'
+  def play_again
+    puts 'Play it again? (1) Yes (2) No'
     ruling = gets.chomp.to_i
     start if ruling == 1
     exit if ruling == 2
   end
 
-  def show_card(flag = true)
-    puts "#{user.name}: #{user.show_cards}, points: #{user.points}"
-    puts "#{dealer.name}: #{flag ? dealer.show_cards : '* ' * dealer.cards.size}, points: #{flag ? dealer.points : ''}"
+  def show_cards(flag = true)
+    puts "#{user.name}: #{user.show_card}, points: #{user.points}"
+    puts "#{dealer.name}: #{flag ? dealer.show_card : '* ' * dealer.cards.size}, points: #{flag ? dealer.points : ''}"
   end
 
   def line
