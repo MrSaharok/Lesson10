@@ -90,7 +90,7 @@ class Game
   end
 
   def auto_showdown
-    if (user.card_limit? && dealer.card_limit?) || (user.card_limit? && !dealer.card_limit??)
+    if (user.card_limit? && dealer.card_limit?) || (user.card_limit? && !dealer.card_limit?)
       true
     else
       showdown
