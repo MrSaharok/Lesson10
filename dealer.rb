@@ -4,7 +4,7 @@ class Dealer < Player
   end
 
   def take_card?
-    if cards.size < 3 && (points < 17)
+    if cards.size < 3 && (self.points < 17)
       puts 'Dealer take a card.'
       true
     else
