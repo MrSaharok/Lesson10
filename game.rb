@@ -21,7 +21,9 @@ class Game
       line
       show_cards(false)
       line
-      user_select
+      user_turn
+      line
+      dealer_turn
       auto_showdown
     end
   end
@@ -30,6 +32,7 @@ class Game
 
   def round
     [user, dealer].each(&:clear)
+    @bank = 0
     @deck = Deck.new
     @deck.shuffling
     [user, dealer].each do |player|
@@ -53,28 +56,25 @@ class Game
       puts "#{dealer.name}:#{dealer.money}$ - WIN!!!"
       puts "#{user.name}:#{user.money}$ - LOSS!!!"
     end
-    @bank = 0
   end
 
-  def user_select
+  def user_turn
     puts 'Select: 1 - skip, 2 - take a card, 3 - show cards'
     user_choise = gets.chomp.to_i
     case user_choise
     when 1
-      skip(user)
+      puts "#{user.name}  pass the turn!"
     when 2
       take_card(user)
+      show_cards(false)
     when 3
       showdown
     else
-      puts 'Error input!'
-      nil
+      puts 'Error input!!!!'
+      raise
     end
-  end
-
-  def skip(player)
-    puts "#{player.name}  pass the turn!"
-    take_card(dealer) if dealer.take_card?
+  rescue
+    retry
   end
 
   def take_card(player)
@@ -87,6 +87,11 @@ class Game
     result
     line
     play_again
+  end
+
+  def dealer_turn
+    puts "#{dealer.name} move!"
+    take_card(dealer) if dealer.take_card?
   end
 
   def auto_showdown
@@ -102,6 +107,9 @@ class Game
     ruling = gets.chomp.to_i
     start if ruling == 1
     exit if ruling == 2
+    raise 'Error input!'
+  rescue
+    retry
   end
 
   def show_cards(flag = true)
