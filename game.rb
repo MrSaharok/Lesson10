@@ -13,15 +13,17 @@ class Game
   end
 
   def start
-    round
     loop do
+      round
       line
       show_cards(false)
       line
-      user_turn
+      l3 = user_turn
       line
-      dealer_turn
-      auto_showdown
+      dealer_turn unless l3
+      result
+      line
+      exit if exit?
     end
   end
 
@@ -40,6 +42,7 @@ class Game
   end
 
   def result
+    show_cards
     if user.points == dealer.points && user.points <= 21
       dealer.money += @bank / 2
       user.money += @bank / 2
@@ -55,7 +58,6 @@ class Game
       puts "#{dealer.name}:#{dealer.money}$ - WIN!!!"
       puts "#{user.name}:#{user.money}$ - LOSS!!!"
     end
-    play_again
   end
 
   def user_turn
@@ -69,6 +71,7 @@ class Game
       show_cards(false)
     when 3
       showdown
+      true
     else
       puts 'Error input!!!!'
       raise
@@ -84,7 +87,6 @@ class Game
   def showdown
     show_cards
     line
-    result
   end
 
   def dealer_turn
@@ -93,29 +95,7 @@ class Game
   end
 
   def auto_showdown
-    if (user.card_limit? && dealer.card_limit?) || (user.card_limit? && !dealer.card_limit?)
-      true
-    else
-      showdown
-    end
-  end
-
-  def play_again
-    exit if dealer.money <= 0 || user.money <= 0
-    puts 'Play it again? (1) Yes (2) No'
-    ruling = gets.chomp.to_i
-
-    case ruling
-    when 1
-      round
-    when 2
-      exit
-    else
-      puts "Error input!"
-      raise
-    end
-  rescue
-    retry
+    (user.card_limit? && dealer.card_limit?) || (user.card_limit? && !dealer.card_limit?)
   end
 
   def show_cards(flag = true)
@@ -125,6 +105,29 @@ class Game
 
   def line
     puts '=' * 21
+  end
+
+  def exit?
+    not_enough_money? || user_want_to_leave?
+  end
+
+  def not_enough_money?
+    dealer.money <= 0 || user.money <= 0
+  end
+
+  def user_want_to_leave?
+    puts 'Play it again? (1) Yes (2) No'
+    ruling = gets.chomp.to_i
+
+    case ruling
+    when 1 then return false
+    when 2 then return true
+    else
+      puts "Error input!"
+      raise
+    end
+  rescue
+    retry
   end
 end
 
