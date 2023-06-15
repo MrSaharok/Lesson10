@@ -55,6 +55,7 @@ class Game
       puts "#{dealer.name}:#{dealer.money}$ - WIN!!!"
       puts "#{user.name}:#{user.money}$ - LOSS!!!"
     end
+    play_again
   end
 
   def user_turn
@@ -84,8 +85,6 @@ class Game
     show_cards
     line
     result
-    line
-    play_again
   end
 
   def dealer_turn
