@@ -14,9 +14,6 @@ class Game
 
   def start
     round
-    if dealer.money <= 0 || user.money <= 0
-      exit
-    end
     loop do
       line
       show_cards(false)
@@ -47,6 +44,8 @@ class Game
       dealer.money += @bank / 2
       user.money += @bank / 2
       puts 'Draw!'
+      puts "#{user.name}:#{user.money}$"
+      puts "#{dealer.name}:#{dealer.money}$"
     elsif (user.points > dealer.points) && user.points <= 21 || (user.points < dealer.points) && dealer.points > 21
       user.money += @bank
       puts "#{user.name}:#{user.money}$ - WIN!!!"
@@ -103,11 +102,19 @@ class Game
   end
 
   def play_again
+    exit if dealer.money <= 0 || user.money <= 0
     puts 'Play it again? (1) Yes (2) No'
     ruling = gets.chomp.to_i
-    start if ruling == 1
-    exit if ruling == 2
-    raise 'Error input!'
+
+    case ruling
+    when 1
+      round
+    when 2
+      exit
+    else
+      puts "Error input!"
+      raise
+    end
   rescue
     retry
   end
