@@ -18,9 +18,9 @@ class Game
       line
       show_cards(false)
       line
-      l3 = user_turn
+      open_up = user_turn
       line
-      dealer_turn unless l3
+      dealer_turn unless open_up
       result
       line
       exit if exit?
@@ -92,10 +92,6 @@ class Game
   def dealer_turn
     puts "#{dealer.name} move!"
     take_card(dealer) if dealer.take_card?
-  end
-
-  def auto_showdown
-    (user.card_limit? && dealer.card_limit?) || (user.card_limit? && !dealer.card_limit?)
   end
 
   def show_cards(flag = true)
